@@ -24,6 +24,7 @@ async function run() {
         const productsCollection = database.collection('productsCollection');
         const clientOrders = database.collection('clientOrders');
         const reviewCollection = database.collection('reviewCollection');
+        const questionCollection = database.collection('questionCollection');
 
         // add an user data
         app.post('/add-user', async (req, res) => {
@@ -182,7 +183,14 @@ async function run() {
             res.send(getReview)
         })
 
+        // add a questions
+        app.post('/add-question', async (req, res) => {
+            const newQuestion = req.body;
+            const result = await questionCollection.insertOne(newQuestion);
+            res.json(result)
+        })
 
+        // questionCollection
 
         // // delete a order collection
         // DELETE API
