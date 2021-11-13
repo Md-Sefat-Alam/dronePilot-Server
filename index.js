@@ -92,6 +92,14 @@ async function run() {
             res.json(result)
         })
 
+        // remove an product
+        app.delete('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(query);
+            res.json(result);
+        })
+
         // get product on limit 6
         app.get('/get-product/6', async (req, res) => {
             const cursor = productsCollection.find({});
@@ -136,6 +144,26 @@ async function run() {
             const query = { orderPerson: uidGet };
             const getUser = clientOrders.find(query)
             const result = await getUser.toArray();
+            res.send(result);
+        })
+        // get all orders
+        app.get('/orders', async (req, res) => {
+            const getUser = clientOrders.find({})
+            const result = await getUser.toArray();
+            res.send(result);
+        })
+        // update pending to shipped
+        app.put('/orders-status/:id', async (req, res) => {
+            const orderId = req.params.id;
+
+            const filter = { _id: ObjectId(orderId) };
+            const options = { upsert: true };
+            const updateUser = {
+                $set: {
+                    orderStatus: 'shipped'
+                },
+            }
+            const result = await clientOrders.updateOne(filter, updateUser, options)
             res.send(result);
         })
 
