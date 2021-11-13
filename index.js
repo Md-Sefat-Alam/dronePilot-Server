@@ -21,6 +21,7 @@ async function run() {
         await client.connect();
         const database = client.db('drone-pilot');
         const userCollection = database.collection('user-data');
+        const productsCollection = database.collection('productsCollection');
 
         // add an user data
         app.post('/add-user', async (req, res) => {
@@ -45,6 +46,80 @@ async function run() {
             // const result = await getUser.toArray();
             res.json(getUser);
         })
+
+        // update normal user to admin user
+        app.put('/users/:uid', async (req, res) => {
+            const uidGet = req.params.uid;
+            if (uidGet === '618e2f2b5494cb57d536b5e7') {
+                return;
+            }
+            const queryParam = req.query.remove;
+            let accessStatus = 'admin'
+            if (queryParam) {
+                accessStatus = 'normal'
+            }
+
+            console.log('hitted update', uidGet);
+            const filter = { userIdentity: uidGet };
+            const options = { upsert: true };
+            const updateUser = {
+                $set: {
+                    access: accessStatus
+                },
+            }
+            const result = await userCollection.updateOne(filter, updateUser, options)
+            res.send(result);
+        })
+
+        // get admin or not
+        app.get('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await userCollection.findOne(query);
+            let isAdmin = false;
+            if (user?.access === 'admin') {
+                isAdmin = true;
+            }
+            res.json({ admin: isAdmin });
+        })
+
+        // add an products
+        app.post('/add-product', async (req, res) => {
+            const newProduct = req.body;
+            const result = await productsCollection.insertOne(newProduct);
+            res.json(result)
+        })
+
+        // get product on limit 6
+        app.get('/get-product/6', async (req, res) => {
+            const cursor = productsCollection.find({});
+            const getUsers = await cursor.limit(6).toArray();
+            res.send(getUsers)
+        })
+        // get product all
+        app.get('/products', async (req, res) => {
+            const cursor = productsCollection.find({});
+            const getUsers = await cursor.toArray();
+            res.send(getUsers)
+        })
+        // get product a product by id
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const cursor = await productsCollection.findOne(query);
+            res.json(cursor);
+        })
+
+
+        // // delete a order collection
+        // DELETE API
+        // app.delete('/my-orders/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: ObjectId(id) };
+        //     const result = await deliveryCollection.deleteOne(query);
+        //     res.json(result);
+        // })
+
     }
     finally {
         // await client.close();
