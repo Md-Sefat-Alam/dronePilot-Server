@@ -22,6 +22,7 @@ async function run() {
         const database = client.db('drone-pilot');
         const userCollection = database.collection('user-data');
         const productsCollection = database.collection('productsCollection');
+        const clientOrders = database.collection('clientOrders');
 
         // add an user data
         app.post('/add-user', async (req, res) => {
@@ -110,6 +111,16 @@ async function run() {
             res.json(cursor);
         })
 
+
+
+
+        // add an order
+        // add an products
+        app.post('/client-order', async (req, res) => {
+            const newProduct = req.body;
+            const result = await clientOrders.insertOne(newProduct);
+            res.json(result)
+        })
 
         // // delete a order collection
         // DELETE API
