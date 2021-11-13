@@ -190,17 +190,6 @@ async function run() {
             res.json(result)
         })
 
-        // questionCollection
-
-        // // delete a order collection
-        // DELETE API
-        // app.delete('/my-orders/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const query = { _id: ObjectId(id) };
-        //     const result = await deliveryCollection.deleteOne(query);
-        //     res.json(result);
-        // })
-
     }
     finally {
         // await client.close();
