@@ -23,6 +23,7 @@ async function run() {
         const userCollection = database.collection('user-data');
         const productsCollection = database.collection('productsCollection');
         const clientOrders = database.collection('clientOrders');
+        const reviewCollection = database.collection('reviewCollection');
 
         // add an user data
         app.post('/add-user', async (req, res) => {
@@ -112,15 +113,48 @@ async function run() {
         })
 
 
-
-
         // add an order
-        // add an products
         app.post('/client-order', async (req, res) => {
             const newProduct = req.body;
             const result = await clientOrders.insertOne(newProduct);
             res.json(result)
         })
+
+        // remove an order
+        app.delete('/my-orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await clientOrders.deleteOne(query);
+            res.json(result);
+        })
+
+
+        // get my orders
+        app.get('/my-orders/:uid', async (req, res) => {
+            const uidGet = req.params.uid;
+            console.log(uidGet)
+            const query = { orderPerson: uidGet };
+            const getUser = clientOrders.find(query)
+            const result = await getUser.toArray();
+            res.send(result);
+        })
+
+
+        // add a review
+        app.post('/add-review', async (req, res) => {
+            const newReview = req.body;
+            const result = await reviewCollection.insertOne(newReview);
+            res.json(result)
+        })
+
+        // get all review
+        app.get('/get-review', async (req, res) => {
+            const cursor = reviewCollection.find({});
+            const getReview = await cursor.toArray();
+            res.send(getReview)
+        })
+
+
 
         // // delete a order collection
         // DELETE API
